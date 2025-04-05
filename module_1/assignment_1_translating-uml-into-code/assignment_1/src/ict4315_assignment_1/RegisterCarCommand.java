@@ -12,30 +12,31 @@ import java.util.Properties;
 public class RegisterCarCommand {
 	
 	private ParkingOffice office;
-	
-	
+
     /**
-     * Constructors: 
+     * Constructor 
      */
 	public RegisterCarCommand(ParkingOffice office) {
 		
 		this.office = office;
 	}
+
+    private void checkParameters(Properties properties) {
+        // Parameter validation logic
+    }
 	
-	private void checkParameters(Properties) {
-		
-	}
-	
-	public String execute(Properties) {
-		
-	}
-	
-	public String getCommandName() {
-	
-	}
-	
-	public String getDisplayName() {
-		
-	}
+    public String execute(Properties properties) {
+        checkParameters(properties);
+        Car car = Car.create(properties);
+        return office.register(car);
+    }
+
+    public String getCommandName() {
+        return "CAR";
+    }
+
+    public String getDisplayName() {
+        return "Register Car";
+    }
 
 }

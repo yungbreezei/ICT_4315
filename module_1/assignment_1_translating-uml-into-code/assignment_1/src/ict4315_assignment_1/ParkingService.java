@@ -7,6 +7,7 @@
 
 package ict4315_assignment_1;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -15,26 +16,27 @@ public class ParkingService {
 	private ParkingOffice office;
 	private Map<String, Command> commands;
 	
-	
     /**
      * Constructors: 
      */
-	public ParkingService(){
+	public ParkingService(ParkingOffice office){
 		
+		this.office = office;
+		this.commands = new HashMap<>();
 	}
 	
-	/* service:ParkingService
-	 * create(parkingOffice)
-	 */
-	
-	
-	
-	private void register(Command) {
-		
-	}
-	
-	public String performCommand(/*String, String[] parameters*/) {
-		
-	}
+    /*
+     * Methods
+     */	 
+    public void register(Command command) {
+        commands.put(command.getCommandName(), command);
+    }
 
+    public String performCommand(String commandType, Properties args) {
+        Command command = commands.get(commandType);
+        if (command != null) {
+            return command.execute(args);
+        }
+        return "Invalid Command";
+    }
 }
