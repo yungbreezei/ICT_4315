@@ -14,7 +14,7 @@ import java.util.Properties;
 public class ParkingService {
 
 	private ParkingOffice office;
-	private Map<String, Command> commands;
+	private Map<String, Command> commands = new HashMap<>();
 	
     /**
      * Constructors: 
@@ -22,7 +22,6 @@ public class ParkingService {
 	public ParkingService(ParkingOffice office){
 		
 		this.office = office;
-		this.commands = new HashMap<>();
 	}
 	
     /*
@@ -32,10 +31,17 @@ public class ParkingService {
         commands.put(command.getCommandName(), command);
     }
 
-    public String performCommand(String commandType, Properties args) {
+    public String performCommand(String commandType, String[] args) {
         Command command = commands.get(commandType);
         if (command != null) {
-            return command.execute(args);
+            Properties props = new Properties();
+            for (String arg : args) {
+                String[] parts = arg.split("=", 2);
+                if (parts.length == 2) {
+                    props.setProperty(parts[0].trim(), parts[1].trim());
+                }
+            }
+            return command.execute(props);
         }
         return "Invalid Command";
     }

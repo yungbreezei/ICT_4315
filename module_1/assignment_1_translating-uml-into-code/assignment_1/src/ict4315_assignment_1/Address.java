@@ -7,9 +7,6 @@
 
 package ict4315_assignment_1;
 
-import java.util.Objects;
-import java.util.regex.Pattern;
-
 public class Address {
 
     private String streetAddress1;
@@ -82,20 +79,6 @@ public class Address {
      * Returns the full address as a formatted string.
      */
     public String getAddressInfo() {
-        // Use a StringBuilder for better performance with string concatenation
-        StringBuilder info = new StringBuilder(streetAddress1);
-        
-        // Include the secondary address line if it's provided
-        if (streetAddress2 != null && !streetAddress2.trim().isEmpty()) {
-            info.append(", ").append(streetAddress2);
-        }
-        
-        // Append the city, state, and ZIP code
-        info.append(", ").append(city)
-            .append(", ").append(state)
-            .append(" ").append(zip);
-        
-        return info.toString();
+        return String.format("%s %s, %s, %s %s", streetAddress1, streetAddress2, city, state, zip);
     }
-    
 }

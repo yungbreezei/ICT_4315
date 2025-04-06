@@ -7,7 +7,6 @@
 
 package ict4315_assignment_1;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -64,5 +63,27 @@ public class ParkingPermit {
     /*
      * Methods
      */	 
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParkingPermit parkingPermit = (ParkingPermit) o;
+        return Objects.equals(id, parkingPermit.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+    
+    @Override
+    public String toString() {
+        return "Parking Permit{" +
+                "id='" + id + '\'' +
+                ", Car='" + car + '\'' +
+                ", Expiration Date='" + expiration + '\'' +
+                '}';
+    }
     
 }

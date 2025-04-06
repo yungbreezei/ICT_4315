@@ -7,11 +7,6 @@
 
 package ict4315_assignment_1;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 import java.util.Objects;
 
 public class ParkingLot {
@@ -52,15 +47,38 @@ public class ParkingLot {
 	    public void setName(String name) {
 	    	this.name = name;
 	    }
-	    public void address(Address address) {
+	    public void setAddress(Address address) {
 	    	this.address = address;
 	    }
    
 	    /*
 	     * Methods
 	     */	 
-	    public Money getDailyRate(CarType) {
-	    	
+	    public Money getDailyRate(CarType carType) {
+	        // Simplified rate calculation
+	        return new Money(carType == CarType.SUV ? 15.00 : 10.00, "USD");
+	    }
+	    
+	    @Override
+	    public boolean equals(Object o) {
+	        if (this == o) return true;
+	        if (o == null || getClass() != o.getClass()) return false;
+	        ParkingLot parkingLot = (ParkingLot) o;
+	        return Objects.equals(id, parkingLot.id);
+	    }
+
+	    @Override
+	    public int hashCode() {
+	        return Objects.hash(id);
+	    }
+	    
+	    @Override
+	    public String toString() {
+	        return "Parking Lot{" +
+	                "Parking Lot id='" + id + '\'' +
+	                ", Parking Lot Name='" + name + '\'' +
+	                ", Parking Lot Address='" + address + '\'' +
+	                '}';
 	    }
 	}
 	

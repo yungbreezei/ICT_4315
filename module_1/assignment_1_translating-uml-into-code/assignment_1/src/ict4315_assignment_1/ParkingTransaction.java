@@ -82,4 +82,27 @@ public class ParkingTransaction {
     /*
      * Methods
      */	 
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParkingTransaction parkingTransaction = (ParkingTransaction) o;
+        return Objects.equals(permit, parkingTransaction.permit);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(permit);
+    }
+    
+    @Override
+    public String toString() {
+        return "Parking Transaction{" +
+                "Permit='" + permit + '\'' +
+                ", Date='" + date + '\'' +
+                ", Parking Lot='" + parkingLot + '\'' +
+                ", Charged Amount='" + chargedAmount + '\'' +
+                '}';
+    }
 }
