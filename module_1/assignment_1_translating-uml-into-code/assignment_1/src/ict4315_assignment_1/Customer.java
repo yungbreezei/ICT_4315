@@ -77,10 +77,10 @@ public class Customer {
     }
     
     public void setPhoneNumber(String phoneNumber) {
-        // param phoneNumber The new phone number (format: XXX-XXX-XXXX)
+        // The new phone number (format: XXX-XXX-XXXX)
         if (!phoneNumber.matches("^\\d{3}-\\d{3}-\\d{4}$")) {
-        	//
-            throw new IllegalArgumentException("Invalid phone number format. Expected: XXX-XXX-XXXX");
+            throw new IllegalArgumentException("Invalid phone number format. "
+            		+ "Expected: XXX-XXX-XXXX");
         }
         this.phoneNumber = phoneNumber; // Update phone number if valid
     }

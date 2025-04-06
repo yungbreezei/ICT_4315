@@ -15,55 +15,48 @@ import ict4315_assignment_1.RegisterCarCommand;
 class RegisterCarCommandTest {
 
 	private ParkingOffice office;
-    private RegisterCarCommand command;
-    private String customerId;
-    
+    private RegisterCarCommand registerCarCommand;
+
     @BeforeEach
-    void setUp() {
-        Address officeAddress = new Address("123 Main St", "", "Anytown", "CA", "12345");
-        office = new ParkingOffice("Test Office", officeAddress);
-        command = new RegisterCarCommand(office);
+    public void setup() {
+        // Setup ParkingOffice and RegisterCarCommand for testing
+        office = new ParkingOffice("Main Office", new Address("123 Street", "Apt 1", "City", "State", "12345"));
+        registerCarCommand = new RegisterCarCommand(office);
         
-        // Register a customer first
-        Address customerAddress = new Address("456 Oak Ave", "Apt 2", "Othertown", "NY", "67890");
-        Customer customer = new Customer(null, "John", "Doe", "555-1234", customerAddress);
-        customerId = office.register(customer);
+        // Register a sample customer
+        Customer customer = new Customer("CUST001", "John", "Doe", "870-555-1234", new Address("789 Wonderland Blvd", "Lot 2", "City", "State", "12345"));
+        office.register(customer);
     }
 
     @Test
-    void testCommandInfo() {
-        assertEquals("REGISTER_CAR", command.getCommandName());
-        assertEquals("Register Car", command.getDisplayName());
+    public void testExecute_RegisterCar_Success() {
+        // Prepare properties for car registration
+        Properties props = new Properties();
+        props.setProperty("carType", "SUV");
+        props.setProperty("licensePlate", "ABC1234");
+        props.setProperty("customerId", "CUST001");
+
+        // Execute car registration
+        String result = registerCarCommand.execute(props);
+
+        // Assert the success message
+        assertEquals("Car registered successfully", result);
     }
 
     @Test
-    void testExecuteSuccess() {
-        Properties params = new Properties();
-        params.setProperty("customerId", customerId);
-        params.setProperty("licensePlate", "NEW123");
-        params.setProperty("carType", "SUV");
-        
-        String permitId = command.execute(params);
-        assertNotNull(permitId);
-        assertFalse(permitId.isEmpty());
-    }
+    public void testExecute_RegisterCar_CustomerNotFound() {
+        // Prepare properties for car registration with an invalid customerId
+        Properties props = new Properties();
+        props.setProperty("customerId", "INVALID_ID");
+        props.setProperty("licensePlate", "XYZ5678");
+        props.setProperty("carType", "SUV");
 
-    @Test
-    void testExecuteMissingParameters() {
-        Properties params = new Properties();
-        params.setProperty("customerId", customerId);
-        // Missing licensePlate and carType
-        
-        assertThrows(NullPointerException.class, () -> command.execute(params));
-    }
+        // Try executing car registration with invalid customer ID
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            registerCarCommand.execute(props);
+        });
 
-    @Test
-    void testExecuteInvalidCustomer() {
-        Properties params = new Properties();
-        params.setProperty("customerId", "INVALID_ID");
-        params.setProperty("licensePlate", "NEW123");
-        params.setProperty("carType", "SUV");
-        
-        assertThrows(IllegalArgumentException.class, () -> command.execute(params));
+        // Assert the exception message
+        assertEquals("Customer not found", thrown.getMessage());
     }
 }

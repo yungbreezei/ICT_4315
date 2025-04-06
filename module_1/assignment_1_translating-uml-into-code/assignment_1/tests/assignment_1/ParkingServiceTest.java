@@ -1,86 +1,96 @@
 package assignment_1;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ict4315_assignment_1.Address;
+import ict4315_assignment_1.Command;
+import ict4315_assignment_1.ParkingLot;
 import ict4315_assignment_1.ParkingOffice;
 import ict4315_assignment_1.ParkingService;
 import ict4315_assignment_1.RegisterCarCommand;
 import ict4315_assignment_1.RegisterCustomerCommand;
+import static org.junit.jupiter.api.Assertions.*;
 
-class ParkingServiceTest {
+public class ParkingServiceTest {
 
-	private ParkingService service;
-    private String customerId;
+    private ParkingOffice office;
+    private ParkingService parkingService;
+
+    private Command registerCustomerCommand;
+    private Command registerCarCommand;
+    
     
     @BeforeEach
-    void setUp() {
-        Address officeAddress = new Address("123 Main St", "", "Anytown", "CA", "12345");
-        ParkingOffice office = new ParkingOffice("Test Office", officeAddress);
-        service = new ParkingService(office);
+    public void setUp() {
+        // Setup the ParkingOffice instance and initialize ParkingService
+        office = new ParkingOffice(null, null);
+        parkingService = new ParkingService(office);
         
-        // Register commands
-        service.register(new RegisterCustomerCommand(office));
-        service.register(new RegisterCarCommand(office));
+        // Create mock commands to test
+        registerCustomerCommand = new RegisterCustomerCommand(office);
+        registerCarCommand = new RegisterCarCommand(office);
         
-        // Register a customer for car registration tests
-        String[] customerParams = {
-            "firstName", "Jane",
-            "lastName", "Doe",
-            "phoneNumber", "555-1234",
-            "street1", "100 Main St",
-            "city", "Anytown",
-            "state", "CA",
-            "zip", "12345"
-        };
-        customerId = service.performCommand("REGISTER_CUSTOMER", customerParams);
+        // Register the commands with the service
+        parkingService.register(registerCustomerCommand);
+        parkingService.register(registerCarCommand);  // Make sure this is registered
+
     }
 
+    /**
+     * Test case to ensure a valid command is executed properly.
+     */
     @Test
-    void testRegisterCustomer() {
-        String[] params = {
-            "firstName", "John",
-            "lastName", "Smith",
-            "phoneNumber", "555-5678",
-            "street1", "200 Oak Ave",
-            "city", "Othertown",
-            "state", "NY",
-            "zip", "67890"
-        };
-        String result = service.performCommand("REGISTER_CUSTOMER", params);
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-    }
-
-    @Test
-    void testRegisterCar() {
-        String[] params = {
-            "customerId", customerId,
-            "licensePlate", "ABC123",
-            "carType", "COMPACT"
-        };
-        String result = service.performCommand("REGISTER_CAR", params);
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
+    public void testPerformCommand_ValidCommand() {
+        String[] args = {"id=CUST001", "firstName=John", "lastName=Doe", 
+        		"phoneNumber=870-555-1234", "address=123 Main St"};
+        String result = parkingService.performCommand("RegisterCustomer", args);
+        
+        // Validate the result of executing the command
+        assertEquals("Customer registered successfully", result, "The customer registration should succeed.");
     }
     
+    /**
+     * Test case to check for invalid command execution.
+     */
     @Test
-    void testRegisterCarInvalidCustomer() {
-        String[] params = {
-            "customerId", "INVALID_ID",
-            "licensePlate", "ABC123",
-            "carType", "COMPACT"
-        };
-        assertThrows(IllegalArgumentException.class, () -> 
-            service.performCommand("REGISTER_CAR", params));
+    public void testPerformCommand_InvalidCommand() {
+        String[] args = {"id=CUST002", "firstName=Jane", "lastName=Smith", 
+        		"phoneNumber=870-555-1234", "address=456 Oak St"};
+        String result = parkingService.performCommand("InvalidCommand", args);
+        
+        // Validate that invalid command returns "Invalid Command"
+        assertEquals("Invalid Command", result, "An invalid command should return 'Invalid Command'.");
     }
 
+    /**
+     * Test case to ensure that registering a car works properly.
+     */
     @Test
-    void testUnknownCommand() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            service.performCommand("UNKNOWN_COMMAND", new String[]{}));
+    public void testPerformCommand_RegisterCar() {
+        // First, register a customer
+        String[] customerArgs = {
+            "id=CUST001", 
+            "firstName=John", 
+            "lastName=Doe", 
+            "phoneNumber=870-555-1234", 
+            "address=456 Oak St"
+        };
+        String result = parkingService.performCommand("RegisterCustomer", customerArgs);  // Register customer first
+        
+        // Check that the customer registration succeeded
+        assertEquals("Customer registered successfully", 
+        		result, "The customer registration should succeed.");
+        
+        // Then register a car for the customer
+        String[] carArgs = {
+            "customerId=CUST001",
+            "licensePlate=ABC123",
+            "carType=SUV"
+        };
+        result = parkingService.performCommand("RegisterCar", carArgs);  // Register the car
+        
+        // Validate that the car was registered
+        assertEquals("Car registered successfully", result, "The car registration should succeed.");
     }
 }

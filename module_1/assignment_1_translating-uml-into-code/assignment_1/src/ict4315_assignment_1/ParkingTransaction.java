@@ -25,6 +25,7 @@ public class ParkingTransaction {
 	private ParkingPermit permit; // Parking permit used for this transaction
 	private ParkingLot parkingLot; // The parking lot where the car is parked
 	private Money chargedAmount; // The amount charged for this transaction
+    private String transactionId; 
     
 
     /**
@@ -32,11 +33,11 @@ public class ParkingTransaction {
      * @param permit The parking permit associated with this transaction.
      * @param parkingLot The parking lot where the car is parked.
      */
-    public ParkingTransaction(Date date, ParkingPermit permit, 
+    public ParkingTransaction(String transactionId, Date date, ParkingPermit permit, 
     		ParkingLot parkingLot, Money chargedAmount) {
-    	
-    	this.date = date;
-        this.permit = permit; 
+        this.transactionId = transactionId;
+        this.date = date;
+        this.permit = permit;
         this.parkingLot = parkingLot;
         this.chargedAmount = chargedAmount;
     }
@@ -60,6 +61,10 @@ public class ParkingTransaction {
     	return chargedAmount;
     }
     
+    public String getTransactionId() {
+        return transactionId;
+    }
+    
     /*
      * Setters
      */	
@@ -77,6 +82,10 @@ public class ParkingTransaction {
     
     public void setChargedAmount(Money chargedAmount) {
     	this.chargedAmount = chargedAmount;
+    }
+    
+    public void setTransactionId(String transactionId) {
+    	this.transactionId = transactionId;
     }
     
     /*

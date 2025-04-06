@@ -48,7 +48,7 @@ public class Car {
      * Retrieves the owner's ID.
      */
     public Customer getOwner() {
-    	return owner;
+        return owner;
     }
     
     /*

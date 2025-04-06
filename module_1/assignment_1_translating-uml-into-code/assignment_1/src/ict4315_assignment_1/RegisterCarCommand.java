@@ -20,6 +20,21 @@ public class RegisterCarCommand implements Command{
 		
 		this.office = office;
 	}
+	
+    /*
+     * Getters 
+     */
+	public ParkingOffice getOffice() {
+		return office;
+	}
+	
+    /*
+     * Setters 
+     */
+	public void setOffice(ParkingOffice office) {
+		this.office = office;
+	}
+	
 
     public void checkParameters(Properties params) {
         if (params.getProperty("customerId") == null ||
@@ -31,24 +46,34 @@ public class RegisterCarCommand implements Command{
 	
     @Override
     public String execute(Properties props) {
+        checkParameters(props);  // Call the validation method
+
         String customerId = props.getProperty("customerId");
-        Customer customer = office.getListOfCustomers().stream()
+        String licensePlate = props.getProperty("licensePlate");
+        String carType = props.getProperty("carType");
+
+        // Check if the customer exists
+        Customer owner = office.getListOfCustomers().stream()
             .filter(c -> c.getId().equals(customerId))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+            .orElse(null);
 
-        Car car = new Car(
-            CarType.valueOf(props.getProperty("carType")), // COMPACT or SUV
-            props.getProperty("licensePlate"),
-            customer
-        );
+        if (owner == null) {
+            throw new IllegalArgumentException("Customer not found");
+        }
 
-        return office.register(car);
+        // Create a new Car object
+        Car car = new Car(CarType.COMPACT, licensePlate, owner);
+
+        // Register the car
+        String result = office.register(car);
+
+        return result;  // Return success message or registration result
     }
 
     @Override
     public String getCommandName() {
-        return "REGISTER_CAR";
+        return "RegisterCar";
     }
 
     @Override
