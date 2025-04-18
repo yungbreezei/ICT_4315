@@ -8,9 +8,11 @@
 package ict4315_assignment_1;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID; // Needed to generate unique transaction IDs
+
+import ict4315.parking.charges.strategy.ParkingChargeStrategy;
 
 
 /**
@@ -19,11 +21,13 @@ import java.util.UUID; // Needed to generate unique transaction IDs
 public class TransactionManager {
 	
     private List<ParkingTransaction> transactions;
+    private ParkingChargeStrategy strategy;
 
 	    // Constructor to initialize the transaction manager
-	    public TransactionManager() {
+	    public TransactionManager(ParkingChargeStrategy strategy) {
 	    	
 	        this.transactions = new ArrayList<>();
+	        this.strategy = strategy;
 	    }
 	    
 	    /*
@@ -31,6 +35,9 @@ public class TransactionManager {
 	     */
 	    public List<ParkingTransaction> getTransactions() {
 	        return new ArrayList<>(transactions); // Return a copy for encapsulation
+	    }
+	    public ParkingChargeStrategy getStrategy() {
+	        return strategy;
 	    }
 	    
 	    /*
@@ -40,20 +47,40 @@ public class TransactionManager {
 	    	this.transactions = transactions;
 	    }
 	    
+	    public void setStrategy(ParkingChargeStrategy strategy) {
+	        this.strategy = strategy;
+	    }
+	    
 	    /*
 	     * Handles parking action and logs a new transaction
 	     */
-	    public ParkingTransaction park(Date date, ParkingPermit permit, ParkingLot parkingLot) {
-	        // Generate unique transaction ID
+	    public ParkingTransaction park(LocalDateTime entryTime, LocalDateTime exitTime,
+                ParkingPermit permit, ParkingLot parkingLot) {
+	    	
+	    	// Generate unique transaction ID
 	        String transactionId = UUID.randomUUID().toString();
+	        
+	        Money baseRate = parkingLot.getBaseRate(); // e.g., $5.00 per day/hour
+	        
+	        ParkingChargeStrategy strategy = parkingLot.getChargeStrategy();
 
-	        // Calculate the amount charged based on car type
-	        Money chargedAmount = parkingLot.getDailyRate(permit.getCar().getType());
+	        if (strategy == null) {
+	            throw new IllegalArgumentException("Parking lot must have a charge strategy assigned.");
+	        }
 
-	        // Create and store the transaction
-	        ParkingTransaction transaction = new ParkingTransaction(transactionId, date, permit, parkingLot, chargedAmount);
+	        // Calculate the amount charged 
+	        Money chargedAmount = strategy.calculateCharge(permit, entryTime, exitTime, baseRate);
+
+	        // Create and record the transaction
+	        ParkingTransaction transaction = new ParkingTransaction(
+	            transactionId,
+	            exitTime,
+	            permit,
+	            parkingLot,
+	            chargedAmount
+	        );
+
 	        transactions.add(transaction);
-
 	        return transaction;
 	    }
 	    

@@ -7,19 +7,19 @@
 
 package ict4315_assignment_1;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class ParkingPermit {
 	
 	private String id;
 	private Car car;
-	private Date expiration;
+	private LocalDateTime expiration;
 
     /**
      * Constructor to initialize a ParkingPermit
      */
-    public ParkingPermit(String id, Car car, Date expiration) {
+    public ParkingPermit(String id, Car car, LocalDateTime expiration) {
     	
         this.id = id; // The unique ID of the parking permit.
         this.car = car; // The car associated with the permit
@@ -40,7 +40,7 @@ public class ParkingPermit {
     	return car;
     }
     
-    public Date getExpiration() {
+    public LocalDateTime getExpiration() {
     	return expiration;
     }
     
@@ -55,7 +55,7 @@ public class ParkingPermit {
     	this.car = car;
     }
     
-    public void setExpiration(Date expiration) {
+    public void setExpiration(LocalDateTime expiration) {
     	this.expiration = expiration;
     }
     

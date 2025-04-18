@@ -1,8 +1,10 @@
 package ict4315_assignment_1;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
+
+import ict4315.parking.charges.strategy.HourlyRateStrategy;
 
 public class MainClass {
 
@@ -16,14 +18,14 @@ public class MainClass {
         Address customerAddress = new Address("456 Elm St", "", "Metropolis", "NY", "10001");
         Customer customer = new Customer(null, "John", "Doe", "555-1234", customerAddress);
         String customerId = office.register(customer);
-        customer.setId(customerId);  // Important: Ensure the ID is set
+        customer.setId(customerId);  // Set the assigned ID
         System.out.println("Customer registered with ID: " + customerId);
 
         // 3. Prepare car registration properties
         Properties carProps = new Properties();
         carProps.setProperty("customerId", customerId);
         carProps.setProperty("licensePlate", "XYZ-123");
-        carProps.setProperty("carType", "SEDAN");  // Assuming enum CarType.SEDAN
+        carProps.setProperty("carType", "SEDAN");
 
         // 4. Register the car using command
         RegisterCarCommand registerCarCommand = new RegisterCarCommand(office);
@@ -36,26 +38,28 @@ public class MainClass {
 
         // 5. Create parking lot and register it
         Address lotAddress = new Address("789 Oak St", "", "Metropolis", "NY", "10001");
-        ParkingLot lot = new ParkingLot("LOT1", "Downtown Lot", lotAddress);
+        ParkingLot lot = new ParkingLot("LOT1", "Downtown Lot", lotAddress, new HourlyRateStrategy(), 7.5, 100);
         office.register(lot);
 
-        // 6. Create a car manually for parking simulation
-        Car car = new Car(CarType.COMPACT, "XYZ-123", customer);
+        // 6. Get the permit created from registration
+        List<ParkingPermit> permits = office.getPermitManager().getPermits();
+        if (permits.isEmpty()) {
+            System.out.println("No permit was registered. Cannot proceed with parking.");
+            return;
+        }
+        ParkingPermit permit = permits.get(0);  // Assume one car was registered
 
-        // 7. Create a permit for the car
-        String permitId = UUID.randomUUID().toString();
-        Date expiration = new Date(System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000); // 30 days from now
-        ParkingPermit permit = new ParkingPermit(permitId, car, expiration);
-
-        // 8. Simulate parking
+        // 7. Simulate parking
         try {
-            ParkingTransaction transaction = office.park(new Date(), permit, lot);
+            LocalDateTime entryTime = LocalDateTime.now();
+            LocalDateTime exitTime = entryTime.plusHours(2);  // Simulate 2-hour parking
+            ParkingTransaction transaction = office.park(entryTime, exitTime, permit, lot);
             System.out.println("Parking successful. Transaction ID: " + transaction.getTransactionId());
         } catch (Exception e) {
             System.out.println("Parking failed: " + e.getMessage());
         }
 
-        // 9. Print parking charges
+        // 8. Print parking charges
         Money charges = office.getParkingCharges(customer);
         System.out.println("Total parking charges: " + charges);
     }

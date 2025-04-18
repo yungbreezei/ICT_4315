@@ -7,8 +7,8 @@
 
 package ict4315_assignment_1;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +51,7 @@ public class PermitManager {
 	    
         String permitId = UUID.randomUUID().toString();
         // Set expiration to 1 year from now
-        Date expiration = new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000);
+        LocalDateTime expiration = LocalDateTime.now().plusYears(1);
         ParkingPermit permit = new ParkingPermit(permitId, car, expiration);
         permits.add(permit);
         return permit;

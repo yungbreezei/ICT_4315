@@ -3,6 +3,8 @@ package assignment_1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
+import ict4315.parking.charges.strategy.HourlyRateStrategy;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.Car;
 import ict4315_assignment_1.CarType;
@@ -15,7 +17,8 @@ import ict4315_assignment_1.PermitManager;
 import ict4315_assignment_1.TransactionManager;
 
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 public class TransactionManagerTest {
 
@@ -37,22 +40,23 @@ public class TransactionManagerTest {
         car = new Car(CarType.SUV, "ABC123", customer);
 
         // Create a ParkingLot with valid details
-        parkingLot = new ParkingLot("PL001", "Downtown Parking", address);
+        parkingLot = new ParkingLot("PL001", "Downtown Parking", address, new HourlyRateStrategy(), 7.5, 100);
 
         // Register the car to get a parking permit from PermitManager
         PermitManager permitManager = new PermitManager();
         permit = permitManager.register(car);
 
         // Initialize the TransactionManager
-        transactionManager = new TransactionManager();
+        transactionManager = new TransactionManager(new FlatDailyRateStrategy());
     }
-
 
     @Test
     public void testParkAndCharge() {
-        // Simulate parking the car
-        Date date = new Date();
-        ParkingTransaction transaction = transactionManager.park(date, permit, parkingLot);
+        // Simulate parking the car with LocalDateTime entry and exit times
+        LocalDateTime entryTime = LocalDateTime.now();
+        LocalDateTime exitTime = entryTime.plusHours(2);  // Assuming 2 hours parking duration
+        
+        ParkingTransaction transaction = transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Verify the transaction is created correctly
         assertNotNull(transaction);
@@ -60,24 +64,27 @@ public class TransactionManagerTest {
         assertEquals(permit, transaction.getPermit());
     }
 
+
     @Test
     public void testGetParkingChargesForPermit() {
-        // Simulate parking the car
-        Date date = new Date();
-        transactionManager.park(date, permit, parkingLot);
+        // Simulate parking the car with a 4-hour stay
+        LocalDateTime entryTime = LocalDateTime.now();
+        LocalDateTime exitTime = entryTime.plusHours(4); // 4 hours
+        transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Get total charges for the permit
         Money totalCharges = transactionManager.getParkingCharges(permit);
 
-        // Assuming the rate for an SUV is 15.00 USD
-        assertEquals(15.00, totalCharges.getAmount());
+        // If base rate is $7.50/hour, 4 hours = 30.00
+        assertEquals(30.00, totalCharges.getAmount());
     }
 
     @Test
     public void testGetParkingChargesForCustomer() {
-        // Simulate parking the car
-        Date date = new Date();
-        transactionManager.park(date, permit, parkingLot);
+        // Simulate parking the car with LocalDateTime entry and exit times
+        LocalDateTime entryTime = LocalDateTime.now();
+        LocalDateTime exitTime = entryTime.plusHours(2);  // Assuming 2 hours parking duration
+        transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Get total charges for the customer
         Money totalCharges = transactionManager.getParkingCharges(customer);
@@ -86,14 +93,16 @@ public class TransactionManagerTest {
         assertEquals(15.00, totalCharges.getAmount());
     }
 
+
     @Test
     public void testDuplicateTransaction() {
         // First transaction for the permit
-        Date date = new Date();
-        transactionManager.park(date, permit, parkingLot);
+        LocalDateTime entryTime = LocalDateTime.now();
+        LocalDateTime exitTime = entryTime.plusHours(2);  // Assuming 2 hours parking duration
+        transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Attempting a second parking transaction with the same permit should add a new transaction
-        ParkingTransaction transaction = transactionManager.park(date, permit, parkingLot);
+        ParkingTransaction transaction = transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Verify that the second transaction was successfully added
         assertNotNull(transaction);
@@ -102,9 +111,10 @@ public class TransactionManagerTest {
 
     @Test
     public void testTransactionChargesByCustomer() {
-        // Simulate parking the car
-        Date date = new Date();
-        transactionManager.park(date, permit, parkingLot);
+        // Simulate parking the car with LocalDateTime entry and exit times
+        LocalDateTime entryTime = LocalDateTime.now();
+        LocalDateTime exitTime = entryTime.plusHours(2);  // Assuming 2 hours parking duration
+        transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Get total charges for the customer
         Money totalCharges = transactionManager.getParkingCharges(customer);
@@ -112,4 +122,5 @@ public class TransactionManagerTest {
         // Assert that the customer is charged correctly
         assertEquals(15.00, totalCharges.getAmount());  // SUV parking rate is 15.00 USD
     }
+
 }

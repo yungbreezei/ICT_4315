@@ -8,8 +8,6 @@
 package ict4315_assignment_1;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -21,7 +19,7 @@ public class ParkingTransaction {
     /*
      * Attributes
      */	 
-	private Date date;
+	private LocalDateTime date;
 	private ParkingPermit permit; // Parking permit used for this transaction
 	private ParkingLot parkingLot; // The parking lot where the car is parked
 	private Money chargedAmount; // The amount charged for this transaction
@@ -33,7 +31,7 @@ public class ParkingTransaction {
      * @param permit The parking permit associated with this transaction.
      * @param parkingLot The parking lot where the car is parked.
      */
-    public ParkingTransaction(String transactionId, Date date, ParkingPermit permit, 
+    public ParkingTransaction(String transactionId, LocalDateTime date, ParkingPermit permit, 
     		ParkingLot parkingLot, Money chargedAmount) {
         this.transactionId = transactionId;
         this.date = date;
@@ -45,7 +43,7 @@ public class ParkingTransaction {
     /*
      * Getters
      */	 
-    public Date getDate() {
+    public LocalDateTime getDate() {
     	return date;
     }
     
@@ -68,7 +66,7 @@ public class ParkingTransaction {
     /*
      * Setters
      */	
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
     	this.date = date;
     }
     

@@ -14,8 +14,12 @@ import ict4315_assignment_1.Money;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.Car;
 import ict4315_assignment_1.CarType;
+import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
+import ict4315.parking.charges.strategy.ParkingChargeStrategy;
+import ict4315_assignment_1.TransactionManager;
+import ict4315_assignment_1.PermitManager;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 class ParkingOfficeTest {
 
@@ -34,13 +38,10 @@ class ParkingOfficeTest {
 
         // Setup a customer with an address
         customer = new Customer("C001", "John Doe", "555-1234", null, 
-        		new Address("123 Main St", "Apt 4B", "Springfield", "IL", "62701"));
+            new Address("123 Main St", "Apt 4B", "Springfield", "IL", "62701"));
 
-        // Setup a parking lot
-        parkingLot = new ParkingLot("P001", "Lot A", address);
-        
-        // Setup a car for the customer
-        car = new Car(CarType.COMPACT, "ABC123", customer);
+        // Setup a parking lot with a FlatDailyRateStrategy
+        parkingLot = new ParkingLot("P001", "Lot A", address, new FlatDailyRateStrategy(), 0, 100);
         
         // Register the customer
         parkingOffice.register(customer);
@@ -49,24 +50,29 @@ class ParkingOfficeTest {
         parkingOffice.register(parkingLot);
         
         // Register the car and get parking permit
-        parkingPermit = new ParkingPermit("Permit001", car, new Date());
+        car = new Car(CarType.COMPACT, "ABC123", customer);
+        parkingPermit = new ParkingPermit("Permit001", car, LocalDateTime.now());
     }
-
+    
     @Test
     public void testRegisterCustomer() {
         // Given
-        ParkingOffice parkingOffice = new ParkingOffice("Main Office", new Address("123 Main St", "Apt 4B", "City", "State", "12345"));
-        Customer customer = new Customer("John Doe", "123-456-7890", null, null, 
-        		new Address("123 Main St", null, "Springfield", "IL", "62701"));
-        
+        ParkingOffice parkingOffice = new ParkingOffice("Main Office", 
+            new Address("123 Main St", "Apt 4B", "City", "State", "12345"));
+
+        Customer customer = new Customer("John", "Doe", "123-456-7890", 
+            null, new Address("123 Main St", null, "Springfield", "IL", "62701"));
+
         // When registering the customer
-        String customerId = parkingOffice.register(customer);
-        
-        // Then check if the customer is added to the list of customers in the parking office
+        String resultMessage = parkingOffice.register(customer);
+
+        // Then: Check if customer was registered successfully
+        assertEquals("Customer registered successfully", resultMessage);
+
+        // And: Verify the customer exists in the list
         boolean isCustomerRegistered = parkingOffice.getListOfCustomers().stream()
-            .anyMatch(c -> c.getId().equals(customerId));  // Assuming Customer has getId method
-        
-        // Assert that the customer is registered
+            .anyMatch(c -> c.getId().equals(customer.getId()));
+
         assertTrue(isCustomerRegistered, "Customer should be registered and added to ParkingOffice.");
     }
 
@@ -99,8 +105,8 @@ class ParkingOfficeTest {
     @Test
     public void testPark() {
         // Assuming you have a valid parking permit and parking lot
-        ParkingTransaction transaction = parkingOffice.park(new Date(), 
-        		parkingPermit, parkingLot);
+        ParkingTransaction transaction = parkingOffice.park(LocalDateTime.now(), 
+        		LocalDateTime.now().plusHours(2), parkingPermit, parkingLot);
 
         assertNotNull(transaction, "Parking transaction should be successful.");
         assertTrue(transaction.getParkingLot().equals(parkingLot), "Parking transaction should be associated with the correct parking lot.");
@@ -138,10 +144,12 @@ class ParkingOfficeTest {
     @Test
     public void testInvalidParkingLotInPark() {
         // Try parking in an unregistered parking lot
-        ParkingLot unregisteredLot = new ParkingLot("P002", "Lot B", address);
+        ParkingLot unregisteredLot = new ParkingLot("P002", "Lot B", address, 
+        		new FlatDailyRateStrategy(), 0, 100);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            parkingOffice.park(new Date(), parkingPermit, unregisteredLot);
+        	parkingOffice.park(LocalDateTime.now(), LocalDateTime.now().plusHours(2), parkingPermit, unregisteredLot);
+
         });
 
         assertEquals("Parking lot not registered", exception.getMessage(), 

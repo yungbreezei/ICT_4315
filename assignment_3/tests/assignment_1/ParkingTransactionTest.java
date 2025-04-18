@@ -2,11 +2,12 @@ package assignment_1;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.Car;
 import ict4315_assignment_1.CarType;
@@ -22,7 +23,7 @@ class ParkingTransactionTest {
     private ParkingPermit permit;
     private ParkingLot parkingLot;
     private Money chargedAmount;
-    private Date date;
+    private LocalDateTime date;
 
     @BeforeEach
     public void setUp() {
@@ -36,12 +37,12 @@ class ParkingTransactionTest {
         // Setup Car and Permit
         Customer customer = new Customer("C101", "Bria", "Wright", "555-9876", address);
         Car car = new Car(CarType.COMPACT, "CMP-1234", customer);
-        permit = new ParkingPermit("PERMIT-1", car, new Date(System.currentTimeMillis() + 86400000)); // +1 day
+        permit = new ParkingPermit("PERMIT-1", car, LocalDateTime.now()); // +1 day
 
         // Setup ParkingLot and Money
-        parkingLot = new ParkingLot("LOT-1", "Downtown Garage", address, null);
+        parkingLot = new ParkingLot("LOT-1", "Downtown Garage", address, new FlatDailyRateStrategy(), 0, 100);
         chargedAmount = new Money(10.00, "USD");
-        date = new Date();
+        date = LocalDateTime.now();
 
         transaction = new ParkingTransaction("",date, permit, parkingLot, chargedAmount);
     }
@@ -56,8 +57,10 @@ class ParkingTransactionTest {
 
     @Test
     public void testSetters() {
-        Date newDate = new Date(System.currentTimeMillis() + 172800000); // +2 days
-        ParkingLot newLot = new ParkingLot("LOT-2", "Airport Lot", parkingLot.getAddress(), null);
+    	LocalDateTime newDate = LocalDateTime.now(); // +2 days
+        ParkingLot newLot = new ParkingLot("LOT-2", "Airport Lot", parkingLot.getAddress(), 
+        		new FlatDailyRateStrategy(), 0, 100);
+        
         Money newAmount = new Money(15.00, "USD");
 
         transaction.setDate(newDate);
@@ -72,7 +75,7 @@ class ParkingTransactionTest {
     @Test
     public void testEqualsAndHashCode() {
         ParkingTransaction duplicateTransaction = new ParkingTransaction(
-                "TXN-2", new Date(), permit, parkingLot, new Money(20.00, "USD"));
+                "TXN-2", LocalDateTime.now(), permit, parkingLot, new Money(20.00, "USD"));
 
         assertEquals(transaction, duplicateTransaction);
         assertEquals(transaction.hashCode(), duplicateTransaction.hashCode());

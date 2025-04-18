@@ -20,17 +20,21 @@ public class ParkingLot {
 		private Address address; // Physical address of the parking lot
 		
 		private ParkingChargeStrategy chargeStrategy; // adding field to hold strategy
+		private Money baseRate; // Base rate used as a foundation for charge strategies
+	    private int capacity;
 
-	    
 	    /**
 	     * Constructor to initialize a ParkingLot.
 	     */
-		public ParkingLot(String id, String name, Address address, 
-				ParkingChargeStrategy chargeStrategy) {
-			this.id = id;
-			this.name = name;
-			this.address = address;
-			this.chargeStrategy = chargeStrategy;
+	    // Constructor with ParkingChargeStrategy
+	    public ParkingLot(String id, String name, Address address, 
+	    		ParkingChargeStrategy chargeStrategy, double baseRate, int capacity) {
+	        this.id = id;
+	        this.name = name;
+	        this.address = address;
+	        this.chargeStrategy = chargeStrategy;
+	        this.baseRate = new Money(baseRate, "USD");
+	        this.capacity = capacity;
 	    }
 	    
 	    /*
@@ -45,8 +49,14 @@ public class ParkingLot {
 	    public Address getAddress() {
 	    	return address;
 	    }
+	    public Money getBaseRate() {
+	        return baseRate;
+	    }
 	    public ParkingChargeStrategy getChargeStrategy() {
 	    	return this.chargeStrategy;
+	    }
+	    public int getCapacity() {
+	        return capacity;
 	    }
 	    
 	    /*
@@ -61,15 +71,20 @@ public class ParkingLot {
 	    public void setAddress(Address address) {
 	    	this.address = address;
 	    }
+	    public void setBaseRate(Money baseRate) {
+	        this.baseRate = baseRate;
+	    }
 	    public void setChargeStrategy(ParkingChargeStrategy strategy) {
 	        this.chargeStrategy = strategy;
+	    }
+	    public void setCapacity(int capacity) {
+	        this.capacity = capacity;
 	    }
    
 	    /*
 	     * Methods
 	     */	 
 	    public Money getDailyRate(CarType carType) {
-	        // Simplified rate calculation
 	        return new Money(carType == CarType.SUV ? 15.00 : 10.00, "USD");
 	    }
 	    
@@ -104,5 +119,3 @@ public class ParkingLot {
 	                '}';
 	    }
 	}
-	
-

@@ -7,7 +7,10 @@
 
 package ict4315_assignment_1;
 
+import java.time.LocalDateTime;
 import java.util.*;
+
+import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
 
 public class ParkingOffice {
 
@@ -18,7 +21,8 @@ public class ParkingOffice {
 	private Address parkingOfficeAddress;
 		
     private final PermitManager permitManager = new PermitManager();
-    private final TransactionManager transactionManager = new TransactionManager();
+    private final TransactionManager transactionManager = 
+    		new TransactionManager(new FlatDailyRateStrategy());
 
     /**
      * Initializes a ParkingOffice with the provided name and address.
@@ -130,11 +134,11 @@ public class ParkingOffice {
         return "Car registered successfully"; 
     }
     
-    public ParkingTransaction park(Date date, ParkingPermit permit, ParkingLot parkingLot) {
+    public ParkingTransaction park(LocalDateTime entryTime, LocalDateTime exitTime, ParkingPermit permit, ParkingLot parkingLot) {
         if (!listOfParkingLots.contains(parkingLot)) {
             throw new IllegalArgumentException("Parking lot not registered");
         }
-        return transactionManager.park(date, permit, parkingLot);
+        return transactionManager.park(entryTime, exitTime, permit, parkingLot);
     }
 
     public Money getParkingCharges(ParkingPermit permit) {

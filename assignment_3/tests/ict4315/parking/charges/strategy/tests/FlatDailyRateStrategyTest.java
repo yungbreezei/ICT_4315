@@ -25,7 +25,7 @@ class FlatDailyRateStrategyTest {
         LocalDateTime expirationLocal = LocalDateTime.of(2025, 12, 31, 23, 59);
         Date expiration = Date.from(expirationLocal.atZone(ZoneId.systemDefault()).toInstant());
 
-        ParkingPermit permit = new ParkingPermit("P001", car, expiration);
+        ParkingPermit permit = new ParkingPermit("P001", car, LocalDateTime.now());
         Money baseRate = new Money(15.0, "USD");
 
         LocalDateTime entry = LocalDateTime.of(2025, 4, 15, 10, 0);
@@ -48,7 +48,7 @@ class FlatDailyRateStrategyTest {
         Date expiration = java.sql.Timestamp.valueOf(expirationDate); // Convert to Date object
         
         // Create the permit with expiration date
-        ParkingPermit permit = new ParkingPermit("P001", car, expiration);
+        ParkingPermit permit = new ParkingPermit("P001", car, LocalDateTime.now());
         
         Money baseRate = new Money(10.0, "USD");
 

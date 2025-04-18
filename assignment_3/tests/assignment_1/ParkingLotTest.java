@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ict4315.parking.charges.strategy.HourlyRateStrategy;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.CarType;
 import ict4315_assignment_1.Money;
@@ -14,6 +15,7 @@ class ParkingLotTest {
 
     private ParkingLot parkingLot;
     private Address address;
+    private Money baseRate;
 
     @BeforeEach
     public void setUp() {
@@ -23,8 +25,10 @@ class ParkingLotTest {
         address.setCity("Denver");
         address.setState("CO");
         address.setZip("80202");
+        
+        baseRate = new Money(10.00, "USD");
 
-        parkingLot = new ParkingLot("PL001", "Downtown Lot", address, null);
+        parkingLot = new ParkingLot("PL001", "Downtown Lot", address, new HourlyRateStrategy(), 7.5, 100);
     }
 
     @Test
@@ -67,14 +71,18 @@ class ParkingLotTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        ParkingLot sameLot = new ParkingLot("PL001", "Downtown Lot", address, null);
+        ParkingLot sameLot = new ParkingLot("PL001", "Downtown Lot", address, 
+        		new HourlyRateStrategy(), 7.5, 100);
+        
         assertEquals(parkingLot, sameLot);
         assertEquals(parkingLot.hashCode(), sameLot.hashCode());
     }
 
     @Test
     public void testNotEqualsDifferentId() {
-        ParkingLot differentLot = new ParkingLot("PL999", "Another Lot", address, null);
+        ParkingLot differentLot = new ParkingLot("PL999", "Another Lot", address, 
+        		new HourlyRateStrategy(), 7.5, 100);
+        
         assertNotEquals(parkingLot, differentLot);
     }
 

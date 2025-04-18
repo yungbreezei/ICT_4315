@@ -2,7 +2,7 @@ package assignment_1;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,26 +25,29 @@ public class PermitManagerTest {
         permitManager = new PermitManager();
         customer = new Customer("C001", "Joe", "Doe", "870-555-1234", new Address("123 Main St", "Apt 1A", 
         		"Springfield", "IL", "62701"));
+        
         car = new Car(CarType.COMPACT, "XYZ123", customer);
     }
 
     @Test
     public void testRegisterPermit() {
-        // Register the car and get the permit
         ParkingPermit permit = permitManager.register(car);
 
-        assertNotNull(permit, "Permit should not be null after registration.");
-        assertNotNull(permit.getId(), "Permit ID should be generated.");
-        assertEquals(car.getLicensePlate(), permit.getCar().getLicensePlate(), "The permit should match the car.");
-        assertEquals(customer.getId(), permit.getCar().getOwner().getId(), "The permit should be associated with the correct customer.");
+        assertNotNull(permit);
+        assertNotNull(permit.getId());
+        assertEquals(car.getLicensePlate(), permit.getCar().getLicensePlate());
+        assertEquals(customer.getId(), permit.getCar().getOwner().getId());
 
-        // Check if the expiration date is set correctly (1 year from now)
-        Date currentDate = new Date();
-        long expirationTime = permit.getExpiration().getTime();
-        long oneYearInMillis = 365L * 24 * 60 * 60 * 1000;
-        assertTrue(expirationTime - currentDate.getTime() >= oneYearInMillis - 1000 && expirationTime - currentDate.getTime() <= oneYearInMillis + 1000,
-                "Expiration time should be approximately one year from now.");
+        // Compare expiration date (allowing 1-second margin)
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expectedExpiration = now.plusYears(1);
+        LocalDateTime actualExpiration = permit.getExpiration();
+
+        // Allow up to 2 seconds of difference due to execution time
+        long secondsDifference = Math.abs(java.time.Duration.between(expectedExpiration, actualExpiration).getSeconds());
+        assertTrue(secondsDifference <= 2, "Expiration should be approximately one year from now.");
     }
+
 
     @Test
     public void testRegisterCarWithoutOwner() {

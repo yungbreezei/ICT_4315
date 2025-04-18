@@ -64,13 +64,23 @@ public class Money{
     }
 
     /**
+     * Round Money output To TwoDecimals
+     *
+     * @return round in times() and arithmetic methods:
+     * avoid stuff like: USD 8.79999999999999
+     */
+    private double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+    /**
      * Multiplies this Money amount by a scalar value.
      *
      * @param multiplier a scalar (e.g., 0.8 for 20% discount)
      * @return a new Money object
      */
     public Money times(double multiplier) {
-        return new Money(this.amount * multiplier, this.currency);
+    	return new Money(roundToTwoDecimals(this.amount * multiplier), this.currency);
     }
        
     /**
