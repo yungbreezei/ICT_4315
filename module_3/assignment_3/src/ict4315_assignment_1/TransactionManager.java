@@ -60,7 +60,7 @@ public class TransactionManager {
 	    	// Generate unique transaction ID
 	        String transactionId = UUID.randomUUID().toString();
 	        
-	        Money baseRate = parkingLot.getBaseRate(); // e.g., $5.00 per day/hour
+	        Money baseRate = parkingLot.getBaseRate(); // e.g., $10.00 per day/hour
 	        
 	        ParkingChargeStrategy strategy = parkingLot.getChargeStrategy();
 
@@ -79,7 +79,8 @@ public class TransactionManager {
 	            parkingLot,
 	            chargedAmount
 	        );
-
+	        
+	        // Save transactions
 	        transactions.add(transaction);
 	        return transaction;
 	    }

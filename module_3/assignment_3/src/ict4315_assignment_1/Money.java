@@ -8,8 +8,8 @@ import java.util.Objects;
  */
 public class Money{
     
-    private double amount;
-    private String currency;
+	private final double amount;
+	private final String currency;
     
     /**
      * Constructs a Money object.\
@@ -28,17 +28,6 @@ public class Money{
     
     public String getCurrency() {
         return currency;
-    }
-    
-    /*
-     * Setters
-     */  
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-    
-    public void setCurrency(String currency) {
-        this.currency = currency;
     }
     
     
@@ -91,12 +80,18 @@ public class Money{
      */
     public int compareTo(Money other) {
         validateCurrencyMatch(other);
-        return Double.compare(this.amount, other.amount);
+        return Double.compare(
+            roundToTwoDecimals(this.amount),
+            roundToTwoDecimals(other.amount)
+        );
     }
+
+
 
     private void validateCurrencyMatch(Money other) {
         if (!this.currency.equals(other.currency)) {
-            throw new IllegalArgumentException("Currencies do not match: " + this.currency + " vs " + other.currency);
+            throw new IllegalArgumentException("Currencies do not match: " + 
+        this.currency + " vs " + other.currency);
         }
     }
     
@@ -105,9 +100,12 @@ public class Money{
         if (this == o) return true;
         if (!(o instanceof Money)) return false;
         Money money = (Money) o;
-        return Double.compare(money.amount, amount) == 0 &&
-                currency.equals(money.currency);
+        return Double.compare(
+                   roundToTwoDecimals(this.amount), 
+                   roundToTwoDecimals(money.amount)
+               ) == 0 && currency.equals(money.currency);
     }
+
 
     @Override
     public int hashCode() {

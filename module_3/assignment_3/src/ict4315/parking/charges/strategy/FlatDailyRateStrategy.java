@@ -18,9 +18,7 @@ public class FlatDailyRateStrategy implements ParkingChargeStrategy{
     private static final double DAILY_RATE = 10.00;
     private static final LocalTime EARLY_CUTOFF = LocalTime.of(6, 0);
     private static final LocalTime LATE_CUTOFF = LocalTime.of(22, 0);
-    private static final Money EVENT_SURCHARGE = new Money(5.00, "USD"); // 1st of month +$5
     private static final Money LATE_EARLY_SURCHARGE = new Money(2.50, "USD"); // Before 6 AM or after 10 PM +$2.50
-    private static final Money WEEKEND_SURCHARGE = new Money(3.00, "USD"); // Weekend +$3
  
     @Override
     public Money calculateCharge(ParkingPermit permit, LocalDateTime entryTime,
@@ -43,23 +41,13 @@ public class FlatDailyRateStrategy implements ParkingChargeStrategy{
         double totalCharge = daysParked * DAILY_RATE;
         
         Money dailyRate = baseRate;
-        
-        // Factor 1: Weekend surcharge
-        DayOfWeek day = entryTime.getDayOfWeek();
-        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-            dailyRate = dailyRate.add(WEEKEND_SURCHARGE);
-        }
-        
+
         // Factor 2: Early or late entry surcharge
         LocalTime entryTimeOnly = entryTime.toLocalTime();
         if (entryTimeOnly.isBefore(EARLY_CUTOFF) || entryTimeOnly.isAfter(LATE_CUTOFF)) {
             dailyRate = dailyRate.add(LATE_EARLY_SURCHARGE);
         }
-        
-        // Factor 3: Graduation Day surcharge
-        if (isGraduationDay(entryTime)) {
-            dailyRate = dailyRate.add(EVENT_SURCHARGE);
-        }
+
         
         // Apply the base rate for the daily charge
         return dailyRate.times(daysParked); // Use the times method to multiply by days

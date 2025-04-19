@@ -9,10 +9,12 @@ import java.time.Duration;
 
 public class HourlyRateStrategy implements ParkingChargeStrategy {
 	
-    private static final double COMPACT_DISCOUNT = 0.95; // 5% off
+    private static final double COMPACT_DISCOUNT = 0.8; // 20% off
 
     @Override
-    public Money calculateCharge(ParkingPermit permit, LocalDateTime entryTime, LocalDateTime exitTime, Money baseRate) {
+    public Money calculateCharge(ParkingPermit permit, LocalDateTime entryTime, 
+    		LocalDateTime exitTime, Money baseRate) {
+    	
         long hours = Duration.between(entryTime, exitTime).toHours();
         if (Duration.between(entryTime, exitTime).toMinutes() % 60 != 0) {
             hours++; // Round up partial hour
@@ -24,6 +26,6 @@ public class HourlyRateStrategy implements ParkingChargeStrategy {
             total = total.times(COMPACT_DISCOUNT);
         }
 
-        return total;
+        return total;   
     }
 }

@@ -58,6 +58,9 @@ public class ParkingOffice {
     public Address getParkingOfficeAddress() {
     	return parkingOfficeAddress;
     }
+    public PermitManager getPermitManager() {
+        return permitManager;
+    }
     
     /*
      * Setters

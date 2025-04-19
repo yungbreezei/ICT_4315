@@ -60,7 +60,11 @@ public class MainClass {
         }
 
         // 8. Print parking charges
-        Money charges = office.getParkingCharges(customer);
-        System.out.println("Total parking charges: " + charges);
+        try {
+            Money charges = office.getParkingCharges(customer);
+            System.out.println("Total parking charges: " + charges);
+        } catch (Exception e) {
+            System.out.println("Failed to retrieve parking charges: " + e.getMessage());
+        }
     }
 }

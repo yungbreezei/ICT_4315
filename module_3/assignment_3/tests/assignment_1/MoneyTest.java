@@ -22,14 +22,6 @@ class MoneyTest {
         assertEquals("USD", money.getCurrency());
     }
 
-    @Test
-    public void testSetters() {
-        money.setAmount(15.75);
-        money.setCurrency("EUR");
-
-        assertEquals(15.75, money.getAmount());
-        assertEquals("EUR", money.getCurrency());
-    }
 
     @Test
     public void testEqualsAndHashCode() {
