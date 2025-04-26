@@ -7,11 +7,11 @@
 
 package ict4315_assignment_1;
 
+
 import java.time.LocalDateTime;
 import java.util.*;
 
 import ict4315.parking.charges.factory.ParkingChargeStrategyFactory;
-import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
 
 public class ParkingOffice {
 
@@ -23,9 +23,7 @@ public class ParkingOffice {
 		
     private final PermitManager permitManager = new PermitManager();
     private final TransactionManager transactionManager;
-    private final ParkingChargeStrategyFactory strategyFactory;
-
-
+    
     /**
      * Initializes a ParkingOffice with the provided name and address.
      * @param listOfCustomers 
@@ -38,7 +36,6 @@ public class ParkingOffice {
     	
         this.parkingOfficeName = parkingOfficeName;
         this.parkingOfficeAddress = parkingOfficeAddress;
-        this.strategyFactory = strategyFactory;
         this.transactionManager = new TransactionManager(strategyFactory);
 
     }

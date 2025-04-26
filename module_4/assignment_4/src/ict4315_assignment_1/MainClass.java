@@ -11,26 +11,43 @@ import ict4315.parking.charges.strategy.HourlyRateStrategy;
 public class MainClass {
 
     public static void main(String[] args) {
+        ParkingOffice office = createParkingOffice();
+        Customer customer = registerCustomer(office);
+        registerCar(office, customer);
 
-        // 1. Create address for the office
+        ParkingLot lot = registerParkingLot(office);
+        ParkingPermit permit = retrievePermit(office);
+
+        if (permit == null) {
+            System.out.println("No permit was registered. Cannot proceed with parking.");
+            return;
+        }
+
+        performParking(office, permit, lot);
+        printParkingCharges(office, customer);
+    }
+
+    private static ParkingOffice createParkingOffice() {
         Address officeAddress = new Address("123 Main St", "Suite 1", "Metropolis", "NY", "10001");
         ParkingChargeStrategyFactory strategyFactory = new DefaultParkingChargeStrategyFactory();
-        ParkingOffice office = new ParkingOffice("Metro Parking", officeAddress, strategyFactory);
+        return new ParkingOffice("Metro Parking", officeAddress, strategyFactory);
+    }
 
-        // 2. Create and register a customer
+    private static Customer registerCustomer(ParkingOffice office) {
         Address customerAddress = new Address("456 Elm St", "", "Metropolis", "NY", "10001");
         Customer customer = new Customer(null, "John", "Doe", "555-1234", customerAddress);
         String customerId = office.register(customer);
-        customer.setId(customerId);  // Set the assigned ID
+        customer.setId(customerId);
         System.out.println("Customer registered with ID: " + customerId);
+        return customer;
+    }
 
-        // 3. Prepare car registration properties
+    private static void registerCar(ParkingOffice office, Customer customer) {
         Properties carProps = new Properties();
-        carProps.setProperty("customerId", customerId);
+        carProps.setProperty("customerId", customer.getId());
         carProps.setProperty("licensePlate", "XYZ-123");
         carProps.setProperty("carType", "SEDAN");
 
-        // 4. Register the car using command
         RegisterCarCommand registerCarCommand = new RegisterCarCommand(office);
         try {
             String result = registerCarCommand.execute(carProps);
@@ -38,31 +55,35 @@ public class MainClass {
         } catch (Exception e) {
             System.out.println("Car registration failed: " + e.getMessage());
         }
+    }
 
-        // 5. Create parking lot and register it
+    private static ParkingLot registerParkingLot(ParkingOffice office) {
         Address lotAddress = new Address("789 Oak St", "", "Metropolis", "NY", "10001");
         ParkingLot lot = new ParkingLot("LOT1", "Downtown Lot", lotAddress, new HourlyRateStrategy(), 7.5, 100);
         office.register(lot);
+        return lot;
+    }
 
-        // 6. Get the permit created from registration
+    private static ParkingPermit retrievePermit(ParkingOffice office) {
         List<ParkingPermit> permits = office.getPermitManager().getPermits();
         if (permits.isEmpty()) {
-            System.out.println("No permit was registered. Cannot proceed with parking.");
-            return;
+            return null;
         }
-        ParkingPermit permit = permits.get(0);  // Assume one car was registered
+        return permits.get(0); // Assuming only one car registered
+    }
 
-        // 7. Simulate parking
+    private static void performParking(ParkingOffice office, ParkingPermit permit, ParkingLot lot) {
         try {
             LocalDateTime entryTime = LocalDateTime.now();
-            LocalDateTime exitTime = entryTime.plusHours(2);  // Simulate 2-hour parking
+            LocalDateTime exitTime = entryTime.plusHours(2);
             ParkingTransaction transaction = office.park(entryTime, exitTime, permit, lot);
             System.out.println("Parking successful. Transaction ID: " + transaction.getTransactionId());
         } catch (Exception e) {
             System.out.println("Parking failed: " + e.getMessage());
         }
+    }
 
-        // 8. Print parking charges
+    private static void printParkingCharges(ParkingOffice office, Customer customer) {
         try {
             Money charges = office.getParkingCharges(customer);
             System.out.println("Total parking charges: " + charges);

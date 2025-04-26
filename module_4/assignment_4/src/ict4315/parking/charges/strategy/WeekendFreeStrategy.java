@@ -1,4 +1,4 @@
-package ict4315.parking.charges.strategy;
++package ict4315.parking.charges.strategy;
 
 import ict4315_assignment_1.*;
 
