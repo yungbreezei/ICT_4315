@@ -28,7 +28,8 @@ class ParkingLotTest {
         
         baseRate = new Money(10.00, "USD");
 
-        parkingLot = new ParkingLot("PL001", "Downtown Lot", address, new HourlyRateStrategy(), 7.5, 100);
+        parkingLot = new ParkingLot("PL001", "Downtown Lot", address, 
+        		new HourlyRateStrategy(), 7.5, 100);
     }
 
     @Test

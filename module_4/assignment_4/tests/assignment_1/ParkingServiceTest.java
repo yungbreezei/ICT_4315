@@ -3,6 +3,8 @@ package assignment_1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ict4315.parking.charges.factory.DefaultParkingChargeStrategyFactory;
+import ict4315.parking.charges.factory.ParkingChargeStrategyFactory;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.Command;
 import ict4315_assignment_1.ParkingLot;
@@ -16,6 +18,8 @@ public class ParkingServiceTest {
 
     private ParkingOffice office;
     private ParkingService parkingService;
+    private ParkingChargeStrategyFactory strategyFactory;
+    private Address address;
 
     private Command registerCustomerCommand;
     private Command registerCarCommand;
@@ -23,8 +27,17 @@ public class ParkingServiceTest {
     
     @BeforeEach
     public void setUp() {
+        
+    	// Initialize strategy factory
+    	strategyFactory = new DefaultParkingChargeStrategyFactory();
+    	
+        // Setup a basic parking office with address
+    	Address address = new Address("100 Office St", "Suite 200", "MetroCity", "IL", "60007");
+
         // Setup the ParkingOffice instance and initialize ParkingService
-        office = new ParkingOffice(null, null);
+        office = new ParkingOffice("Main Office", address, strategyFactory);
+        
+        // Initialize ParkingService with the ParkingOffice
         parkingService = new ParkingService(office);
         
         // Create mock commands to test
@@ -42,11 +55,16 @@ public class ParkingServiceTest {
      */
     @Test
     public void testPerformCommand_ValidCommand() {
-        String[] args = {"id=CUST001", "firstName=John", "lastName=Doe", 
-        		"phoneNumber=870-555-1234", "address=123 Main St"};
+        String[] args = {
+            "id=CUST001",
+            "firstName=John",
+            "lastName=Doe",
+            "phoneNumber=870-555-1234",
+            "address=123 Main St, apt 3, Springfield, IL, 62704"
+        };
+        
         String result = parkingService.performCommand("RegisterCustomer", args);
         
-        // Validate the result of executing the command
         assertEquals("Customer registered successfully", result, "The customer registration should succeed.");
     }
     
@@ -55,11 +73,16 @@ public class ParkingServiceTest {
      */
     @Test
     public void testPerformCommand_InvalidCommand() {
-        String[] args = {"id=CUST002", "firstName=Jane", "lastName=Smith", 
-        		"phoneNumber=870-555-1234", "address=456 Oak St"};
+        String[] args = {
+            "id=CUST002",
+            "firstName=Jane",
+            "lastName=Smith",
+            "phoneNumber=870-555-1234",
+            "address=456 Oak St, lot 3, Denver, CO, 80014"
+        };
+        
         String result = parkingService.performCommand("InvalidCommand", args);
         
-        // Validate that invalid command returns "Invalid Command"
         assertEquals("Invalid Command", result, "An invalid command should return 'Invalid Command'.");
     }
 
@@ -68,19 +91,18 @@ public class ParkingServiceTest {
      */
     @Test
     public void testPerformCommand_RegisterCar() {
-        // First, register a customer
+        // First register a customer
         String[] customerArgs = {
-            "id=CUST001", 
-            "firstName=John", 
-            "lastName=Doe", 
-            "phoneNumber=870-555-1234", 
-            "address=456 Oak St"
+            "id=CUST001",
+            "firstName=John",
+            "lastName=Doe",
+            "phoneNumber=870-555-1234",
+            "address=456 Oak St, lot 3, Denver, CO, 80014"
         };
-        String result = parkingService.performCommand("RegisterCustomer", customerArgs);  // Register customer first
         
-        // Check that the customer registration succeeded
-        assertEquals("Customer registered successfully", 
-        		result, "The customer registration should succeed.");
+        String result = parkingService.performCommand("RegisterCustomer", customerArgs);
+        
+        assertEquals("Customer registered successfully", result, "The customer registration should succeed.");
         
         // Then register a car for the customer
         String[] carArgs = {
@@ -88,9 +110,9 @@ public class ParkingServiceTest {
             "licensePlate=ABC123",
             "carType=SUV"
         };
-        result = parkingService.performCommand("RegisterCar", carArgs);  // Register the car
         
-        // Validate that the car was registered
+        result = parkingService.performCommand("RegisterCar", carArgs);
+        
         assertEquals("Car registered successfully", result, "The car registration should succeed.");
     }
 }

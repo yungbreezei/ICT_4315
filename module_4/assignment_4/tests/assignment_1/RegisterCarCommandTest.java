@@ -20,7 +20,7 @@ class RegisterCarCommandTest {
     @BeforeEach
     public void setup() {
         // Setup ParkingOffice and RegisterCarCommand for testing
-        office = new ParkingOffice("Main Office", new Address("123 Street", "Apt 1", "City", "State", "12345"));
+        office = new ParkingOffice("Main Office", new Address("123 Street", "Apt 1", "City", "State", "12345"), null);
         registerCarCommand = new RegisterCarCommand(office);
         
         // Register a sample customer

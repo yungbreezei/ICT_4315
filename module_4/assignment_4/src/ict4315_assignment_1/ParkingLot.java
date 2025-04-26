@@ -10,7 +10,6 @@ package ict4315_assignment_1;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import ict4315.parking.charges.strategy.HourlyRateStrategy;
 import ict4315.parking.charges.strategy.ParkingChargeStrategy;
 
 public class ParkingLot {
@@ -86,6 +85,8 @@ public class ParkingLot {
 	     * Methods
 	     */	 
 	    public Money getDailyRate(CarType carType) {
+	    	
+	    	// Base daily rate based on car type, with flexibility to change in the future
 	        return new Money(carType == CarType.SUV ? 15.00 : 10.00, "USD");
 	    }
 	    

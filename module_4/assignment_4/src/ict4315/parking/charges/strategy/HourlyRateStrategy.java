@@ -21,6 +21,7 @@ public class HourlyRateStrategy implements ParkingChargeStrategy {
     public Money calculateCharge(ParkingPermit permit, LocalDateTime entryTime, 
     		LocalDateTime exitTime, Money baseRate) {
     	
+    	// Calculate total hours, rounding up if there are any leftover minutes
         long hours = Duration.between(entryTime, exitTime).toHours();
         
         // Round up if there's any remaining minutes
@@ -28,6 +29,7 @@ public class HourlyRateStrategy implements ParkingChargeStrategy {
             hours++;
         }
 
+        // Calculate the base charge for the total hours parked
         Money total = baseRate.times(hours);
         
         // Apply 20% discount for compact cars

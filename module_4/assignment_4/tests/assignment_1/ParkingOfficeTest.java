@@ -14,6 +14,8 @@ import ict4315_assignment_1.Money;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.Car;
 import ict4315_assignment_1.CarType;
+import ict4315.parking.charges.factory.DefaultParkingChargeStrategyFactory;
+import ict4315.parking.charges.factory.ParkingChargeStrategyFactory;
 import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
 import ict4315.parking.charges.strategy.ParkingChargeStrategy;
 import ict4315_assignment_1.TransactionManager;
@@ -29,12 +31,16 @@ class ParkingOfficeTest {
     private Car car;
     private ParkingPermit parkingPermit;
     private Address address;
+    private ParkingChargeStrategyFactory strategyFactory;
 
     @BeforeEach
     public void setUp() {
+    	// Initialize strategy factory
+    	strategyFactory = new DefaultParkingChargeStrategyFactory();
+    	
         // Setup a basic parking office with address
         address = new Address("123 Office St", "Suite 500", "Chicago", "IL", "60601");
-        parkingOffice = new ParkingOffice("Downtown Parking", address);
+        parkingOffice = new ParkingOffice("Downtown Parking", address, strategyFactory);
 
         // Setup a customer with an address
         customer = new Customer("C001", "John Doe", "555-1234", null, 
@@ -58,7 +64,7 @@ class ParkingOfficeTest {
     public void testRegisterCustomer() {
         // Given
         ParkingOffice parkingOffice = new ParkingOffice("Main Office", 
-            new Address("123 Main St", "Apt 4B", "City", "State", "12345"));
+            new Address("123 Main St", "Apt 4B", "City", "State", "12345"), strategyFactory);
 
         Customer customer = new Customer("John", "Doe", "123-456-7890", 
             null, new Address("123 Main St", null, "Springfield", "IL", "62701"));
@@ -130,7 +136,7 @@ class ParkingOfficeTest {
 
     @Test
     public void testInvalidCustomerRegistrationForCar() {
-        ParkingOffice parkingOffice = new ParkingOffice("Main Office", new Address("123 Main St", "Apt 4B", "City", "State", "12345"));
+        ParkingOffice parkingOffice = new ParkingOffice("Main Office", new Address("123 Main St", "Apt 4B", "City", "State", "12345"), null);
         Customer invalidCustomer = new Customer("John Doe", "123-456-7890", null, null, 
         		new Address("123 Main St", null, "Springfield", "IL", "62701"));
         Car invalidCar = new Car(CarType.SUV, "ABC123", invalidCustomer);  // This customer is not registered in the parking office

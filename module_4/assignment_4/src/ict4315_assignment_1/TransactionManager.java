@@ -53,6 +53,11 @@ public class TransactionManager {
 	    public ParkingTransaction park(LocalDateTime entryTime, LocalDateTime exitTime,
                 ParkingPermit permit, ParkingLot parkingLot) {
 	    	
+	        // Check for null values before proceeding
+	        if (entryTime == null || exitTime == null || permit == null || parkingLot == null) {
+	            throw new IllegalArgumentException("Invalid input: entryTime, exitTime, permit, or parkingLot cannot be null.");
+	        }
+	    	
 	    	// Generate unique transaction ID
 	        String transactionId = UUID.randomUUID().toString();
 	        
@@ -79,8 +84,9 @@ public class TransactionManager {
 	            chargedAmount
 	        );
 	        
-	        // Save transactions
+	        // Save transactions in the list
 	        transactions.add(transaction);
+	        
 	        return transaction;
 	        
 	    }
@@ -101,6 +107,11 @@ public class TransactionManager {
 	     * Returns total charges for all transactions of a given customer
 	     */
 	    public Money getParkingCharges(Customer customer) {
+	    	
+	        if (customer == null) {
+	            throw new IllegalArgumentException("Customer cannot be null.");
+	        }
+
 	        double total = transactions.stream()
 	                .filter(t -> t.getPermit().getCar().getOwner().equals(customer))
 	                .mapToDouble(t -> t.getChargedAmount().getAmount())

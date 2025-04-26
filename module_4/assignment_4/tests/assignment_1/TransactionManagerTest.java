@@ -3,8 +3,11 @@ package assignment_1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ict4315.parking.charges.factory.DefaultParkingChargeStrategyFactory;
+import ict4315.parking.charges.factory.ParkingChargeStrategyFactory;
 import ict4315.parking.charges.strategy.FlatDailyRateStrategy;
 import ict4315.parking.charges.strategy.HourlyRateStrategy;
+import ict4315.parking.charges.strategy.ParkingChargeStrategy;
 import ict4315_assignment_1.Address;
 import ict4315_assignment_1.Car;
 import ict4315_assignment_1.CarType;
@@ -28,8 +31,10 @@ public class TransactionManagerTest {
     private Car car;
     private Customer customer;
 
+
     @BeforeEach
     public void setUp() {
+    	
         // Create an Address object using the updated constructor
         Address address = new Address("1234 Parking St", "Apt 101", "City", "State", "12345");
 
@@ -40,15 +45,23 @@ public class TransactionManagerTest {
         car = new Car(CarType.SUV, "ABC123", customer);
 
         // Create a ParkingLot with valid details
-        parkingLot = new ParkingLot("PL001", "Downtown Parking", address, new HourlyRateStrategy(), 7.5, 100);
+        parkingLot = new ParkingLot("PL001", "Downtown Parking", address, 
+        		new HourlyRateStrategy(), 7.5, 100);
 
         // Register the car to get a parking permit from PermitManager
         PermitManager permitManager = new PermitManager();
         permit = permitManager.register(car);
 
-        // Initialize the TransactionManager
-        transactionManager = new TransactionManager(new FlatDailyRateStrategy());
+        // Create a ParkingChargeStrategyFactory and TransactionManager
+        ParkingChargeStrategyFactory strategyFactory = new ParkingChargeStrategyFactory() {
+            @Override
+            public ParkingChargeStrategy getStrategyFor(ParkingLot lot) {
+                return new HourlyRateStrategy();
+            }
+        };
+        transactionManager = new TransactionManager(strategyFactory);
     }
+
 
     @Test
     public void testParkAndCharge() {
@@ -56,7 +69,8 @@ public class TransactionManagerTest {
         LocalDateTime entryTime = LocalDateTime.now();
         LocalDateTime exitTime = entryTime.plusHours(2);  // Assuming 2 hours parking duration
         
-        ParkingTransaction transaction = transactionManager.park(entryTime, exitTime, permit, parkingLot);
+        ParkingTransaction transaction = transactionManager.park(entryTime, exitTime, 
+        		permit, parkingLot);
 
         // Verify the transaction is created correctly
         assertNotNull(transaction);
@@ -75,7 +89,7 @@ public class TransactionManagerTest {
         // Get total charges for the permit
         Money totalCharges = transactionManager.getParkingCharges(permit);
 
-        // If base rate is $7.50/hour, 4 hours = 30.00
+        // If base rate is $15.0/hour, 4 hours = 30.00
         assertEquals(30.00, totalCharges.getAmount());
     }
 
@@ -102,7 +116,8 @@ public class TransactionManagerTest {
         transactionManager.park(entryTime, exitTime, permit, parkingLot);
 
         // Attempting a second parking transaction with the same permit should add a new transaction
-        ParkingTransaction transaction = transactionManager.park(entryTime, exitTime, permit, parkingLot);
+        ParkingTransaction transaction = transactionManager.park(entryTime, exitTime, 
+        		permit, parkingLot);
 
         // Verify that the second transaction was successfully added
         assertNotNull(transaction);
@@ -122,5 +137,26 @@ public class TransactionManagerTest {
         // Assert that the customer is charged correctly
         assertEquals(15.00, totalCharges.getAmount());  // SUV parking rate is 15.00 USD
     }
+    
+    @Test
+    public void testHourlyRateWithDiscountForCompactCar() {
+        // Setup entry and exit times
+        LocalDateTime entryTime = LocalDateTime.now();
+        LocalDateTime exitTime = entryTime.plusHours(3); // 3-hour parking
+        
+        // Create a compact car with a parking permit
+        Car compactCar = new Car(CarType.COMPACT, "XYZ123", customer);
+        ParkingPermit compactPermit = new PermitManager().register(compactCar);
 
+        // Set the base hourly rate
+        Money baseRate = new Money(7.5, "USD"); // $7.50 per hour
+
+        // Create the HourlyRateStrategy and calculate the charge
+        HourlyRateStrategy hourlyStrategy = new HourlyRateStrategy();
+        Money charge = hourlyStrategy.calculateCharge(compactPermit, entryTime, exitTime, baseRate);
+
+        // Expected calculation with discount: 3 hours * 7.50 * 0.80 = $18.00
+        assertEquals(18.00, charge.getAmount());
+    }
+    
 }

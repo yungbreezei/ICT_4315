@@ -18,7 +18,7 @@ class RegisterCustomerCommandTest {
 
     @BeforeEach
     public void setUp() {
-        office = new ParkingOffice("Main Office", new Address("123 Main St", "Apt 1", "City", "State", "12345"));  // Create the ParkingOffice instance with valid Address
+        office = new ParkingOffice("Main Office", new Address("123 Main St", "Apt 1", "City", "State", "12345"), null);  // Create the ParkingOffice instance with valid Address
         registerCustomerCommand = new RegisterCustomerCommand(office);  // Initialize the RegisterCustomerCommand
     }
 
